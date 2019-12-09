@@ -28,6 +28,24 @@ public class ManageServiceImpl implements ManageService {
     @Autowired
     BaseAttrValueMapper baseAttrValueMapper;
 
+    @Autowired
+    SpuInfoMapper  spuInfoMapper;
+
+
+     @Autowired
+     BaseSaleAttrMapper baseSaleAttrMapper;
+
+     @Autowired
+     SpuSaleAttrMapper spuSaleAttrMapper;
+
+     @Autowired
+     SpuImageMapper spuImageMapper;
+
+     @Autowired
+     SpuSaleAttrValueMapper spuSaleAttrValueMapper;
+
+
+
     @Override
     public List<BaseCatalog1> getCatalog1() {
         return baseCatalog1Mapper.selectAll();
@@ -69,13 +87,18 @@ public class ManageServiceImpl implements ManageService {
         }else{
             baseAttrInfoMapper.updateByPrimaryKey(baseAttrInfo);
         }
+
+
+        BaseAttrValue baseAttrValueDel = new BaseAttrValue();
+        baseAttrValueDel.setAttrId(baseAttrInfo.getId());
+        baseAttrValueMapper.delete(baseAttrValueDel);
+        System.out.println("删除数据");
          //2.添加 BaseAttrValue
         List<BaseAttrValue> attrValueList = baseAttrInfo.getAttrValueList();
         if(attrValueList!=null&& attrValueList.size()!=0){
 
             for (int i = 0; i < attrValueList.size(); i++) {
-                BaseAttrValue  baseAttrValue=  attrValueList.get(i);
-                baseAttrValueMapper.delete(baseAttrValue);
+                BaseAttrValue  baseAttrValue=attrValueList.get(i);
                 baseAttrValue.setAttrId(baseAttrInfo.getId());
                 baseAttrValueMapper.insertSelective(baseAttrValue);
             }
@@ -98,6 +121,87 @@ public class ManageServiceImpl implements ManageService {
         //给属性对象返回
         baseAttrInfo.setAttrValueList(attrValueList);
         return baseAttrInfo;
+    }
+
+    @Override
+    public List<SpuInfo> getSpuInfoList(SpuInfo spuInfo) {
+        return spuInfoMapper.select(spuInfo);
+    }
+
+    @Override
+    public List<BaseSaleAttr> getBaseSaleAttrList() {
+            return baseSaleAttrMapper.selectAll();
+    }
+
+
+
+
+    //大保存
+    //需要保存多张表
+    //      SpuInfo
+    //		SpuImage
+    //		SpuSaleAttr
+    //		SpuSaleAttrValue
+    @Override
+    @Transactional
+    public void saveSpuInfo(SpuInfo spuInfo) {
+         //1添加SupInfo表
+        if (spuInfo.getId()==null || spuInfo.getId().length()==0) {
+            spuInfo.setId(null);
+            int i = spuInfoMapper.insertSelective(spuInfo);
+        }else{
+            spuInfoMapper.updateByPrimaryKeySelective(spuInfo);
+        }
+        //2添加图片表,先执行删除再执行添加避免重复添加
+
+        SpuImage spuImage = new SpuImage();
+        spuImage.setSpuId(spuInfo.getId());
+        spuImageMapper.delete(spuImage);
+
+        SpuSaleAttr spuSaleAttr = new SpuSaleAttr();
+        spuSaleAttr.setSpuId(spuInfo.getId());
+        spuSaleAttrMapper.delete(spuSaleAttr);
+
+        // 销售属性值 删除，插入
+        SpuSaleAttrValue spuSaleAttrValue = new SpuSaleAttrValue();
+        spuSaleAttrValue.setSpuId(spuInfo.getId());
+        spuSaleAttrValueMapper.delete(spuSaleAttrValue);
+        List<SpuImage> spuImageList = spuInfo.getSpuImageList();
+        if(spuImageList!=null&&spuImageList.size()!=0){
+            for (int m= 0; m < spuImageList.size(); m++) {
+                SpuImage  spuImage1=spuImageList.get(m);
+                spuImage1.setId(null);
+                spuImage1.setSpuId(spuInfo.getId());
+                spuImageMapper.insertSelective(spuImage1);
+            }
+        }
+        //添加属性名称表先执行删除再执行添加避免重复添加
+        List<SpuSaleAttr> spuSaleAttrList=spuInfo.getSpuSaleAttrList();
+        if(spuSaleAttrList!=null&&spuSaleAttrList.size()!=0){
+            for (int n = 0; n < spuSaleAttrList.size(); n++) {
+                SpuSaleAttr   spuSaleAttr1=spuSaleAttrList.get(n);
+                spuSaleAttr1.setId(null);
+                spuSaleAttr1.setSpuId(spuInfo.getId());
+                //添加属性值表先执行删除再执行添加避免重复添加
+                List<SpuSaleAttrValue> spuSaleAttrValueList = spuSaleAttr1.getSpuSaleAttrValueList();
+                if(spuSaleAttrValueList!=null&&spuSaleAttrValueList.size()!=0){
+                    for (int k = 0; k < spuSaleAttrValueList.size(); k++) {
+                        SpuSaleAttrValue spuSaleAttrValue1 = spuSaleAttrValueList.get(k);
+                        spuSaleAttrValue1.setId(null);
+                        spuSaleAttrValue1.setSpuId(spuInfo.getId());
+                        spuSaleAttrValueMapper.insert( spuSaleAttrValue1);
+                    }
+                }
+                spuSaleAttrMapper.insertSelective(spuSaleAttr1);
+
+
+            }
+        }
+
+
+
+
+
     }
 
 
