@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper SYSTEM "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+
+<!--
+   其中namespace:代表mapper文件的全路径
+-->
+<mapper namespace="com.atguigu.gmall0624.manageservice.mapper.BaseAttrInfoMapper">
+
+    <!--1.其中result代表的是返回的结果集
+        2.autoMapping="true"代表可以进行自动自动装配
+        3.id为返回结果集的唯一标识
+        4.type为返回值的类型-->
+    <resultMap id="baseAttrInfoMap" type="com.atguigu.gmall0624.bean.BaseAttrInfo"  autoMapping="true">
+       <!--1.id代表主键其中有两个属性：1.property "实体类的字段"
+       2.cloumn "数据库中的字段值"-->
+        <id  property="id" column="id"></id>
+        <!--其他字段应该为-->
+        <!--<result  property=""  column=""></result>
+        由于存在automapping所以不需要书写-->
+        <!--由于存在非数据库字段为1对多所以用collection标签
+         property:实体类的属性 ofType：集合的泛型的全路径-->
+        <collection property="attrValueList" ofType="com.atguigu.gmall0624.bean.BaseAttrValue" autoMapping="true">
+            <id property="id" column="attr_value_id"></id>
+        </collection>
+    </resultMap>
+    <!--  id：对应的Mapper文件的名字  resultMap:返回值的id-->
+    <select id="getattrInfoList"  resultMap="baseAttrInfoMap">
+  SELECT
+   bai.id,
+   bai.attr_name,
+   bai.catalog3_id,
+   bav.id attr_value_id,
+   bav.value_name,
+   bav.attr_id
+FROM
+   base_attr_info bai
+INNER JOIN base_attr_value bav ON bai.id = bav.attr_id
+WHERE
+   catalog3_id = #{0}
+    </select>
+
+
+
+
+
+
+
+</mapper>

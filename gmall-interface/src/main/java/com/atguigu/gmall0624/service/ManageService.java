@@ -23,4 +23,13 @@ public interface ManageService {
     public List<BaseSaleAttr>  getBaseSaleAttrList();
 
     void saveSpuInfo(SpuInfo spuInfo);
+
+    List<SpuImage> getSpuImageList(SpuImage spuImage);
+
+
+    List<BaseAttrInfo> getattrInfoList(String catalog3Id);
+
+    List<SpuSaleAttr> getSpuSaleAttrList(String spuId);
+
+    void saveSkuInfo(SkuInfo skuInfo);
 }

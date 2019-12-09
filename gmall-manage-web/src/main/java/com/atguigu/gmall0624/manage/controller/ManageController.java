@@ -43,7 +43,7 @@ public class ManageController {
     //根据3级分类的Id查询商品的平台属性attrInfoList
    @RequestMapping("attrInfoList")
     public List<BaseAttrInfo>   attrInfoList(String catalog3Id){
-       List<BaseAttrInfo> attrList = manageService.getAttrList(catalog3Id);
+       List<BaseAttrInfo> attrList = manageService.getattrInfoList(catalog3Id);
        return   attrList;
 
    }
