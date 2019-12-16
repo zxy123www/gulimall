@@ -32,4 +32,14 @@ public interface ManageService {
     List<SpuSaleAttr> getSpuSaleAttrList(String spuId);
 
     void saveSkuInfo(SkuInfo skuInfo);
+
+    SkuInfo selectSkuInfoBySkuId(String skuId);
+
+
+
+    List<SpuSaleAttr> getSpuSaleAttrBySkuInfo(SkuInfo skuInfo);
+
+    List<SkuSaleAttrValue> getSkuSaleAttrValueListBySpu(String spuId);
+
+    List<BaseAttrInfo> getAttrListByIds(List<String> attrValueIdList);
 }
